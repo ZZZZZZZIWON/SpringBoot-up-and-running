@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +19,108 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class SburRestDemoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SburRestDemoApplication.class, args);
 	}
 
+	@Bean
+	@ConfigurationProperties(prefix = "droid")
+	Droid createDroid() {
+		return new Droid();
+	}
+}
+
+@RestController
+@RequestMapping("/droid")
+class DroidController {
+	private final Droid droid;
+
+	public DroidController(Droid droid) {
+		this.droid = droid;
+	}
+
+	@GetMapping
+	Droid getDroid() {
+		return droid;
+	}
+
+}
+
+class Droid {
+	private String id, description;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+}
+/*
+*  @Vaule 어노테이션이 멤버 변수 name에 적용되고, 어노테이션 문자열 타입을 단일 매개변수로 하여 속성값을 적음
+* */
+@RestController
+@RequestMapping("/greeting")
+class GreetingController {
+
+	private final Greeting greeting;
+
+	GreetingController(Greeting greeting) {
+		this.greeting = greeting;
+	}
+
+	/*
+	* 속성값 SpEL형식
+	* - 구분자의 ${ } 사이에 적음
+	* - 애플리케이션 환경에서 속성값이 정의되지 않은 경우 -> 기본값을 콜론(:) 뒤에 적기
+	* */
+
+	/*
+	* @Value의 두 속성은 모두 application.properties에 정의됨 -> 쿼리 결과와 application.properties에 정의한 속성값이 일치
+	* */
+	@GetMapping
+	String getGreeting() {
+		return greeting.getName();
+	}
+
+	@GetMapping("/coffee")
+	String getNameAndCoffee() {
+		return greeting.getCoffee();
+	}
+
+}
+@ConfigurationProperties(prefix = "greeting")
+class Greeting {
+	private String name;
+	private String coffee;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCoffee() {
+		return coffee;
+	}
+
+	public void setCoffee(String coffee) {
+		this.coffee = coffee;
+	}
 }
 
 @Entity
