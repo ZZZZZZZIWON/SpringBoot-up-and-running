@@ -144,7 +144,6 @@ class RestApiDemoController{
 		return (coffeeRepository.existsById(id)) ?
 			new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.OK) :
 			new ResponseEntity<>(coffeeRepository.save(coffee), HttpStatus.CREATED);
->>>>>>> chapter4
 	}
 
 	@DeleteMapping("/{id}")
